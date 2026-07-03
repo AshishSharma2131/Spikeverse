@@ -3,10 +3,6 @@
 
 **A neuromorphic reinforcement learning framework that converts state-of-the-art Deep RL policies into spiking neural networks — cutting inference compute by 80% without sacrificing performance.**
 
-![Status](https://img.shields.io/badge/status-research-orange)
-![Domain](https://img.shields.io/badge/domain-Neuromorphic%20Computing-blueviolet)
-![RL](https://img.shields.io/badge/RL-Rainbow%20DQN-red)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
