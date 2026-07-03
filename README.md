@@ -1,8 +1,7 @@
 # Spikeverse: A Neuromorphic Reinforcement Learning Framework for Autonomous Control
 
 **Brain and Cognitive Science (BCS) Club, IIT Kanpur**[cite: 1]  
-**Research Timeline:** May 2025 – Jul 2025[cite: 1]  
-**Mentors:** Gaurav Rampuria, Kshitiz Tyagi, Saubhagya Pandey[cite: 1]
+**Research Timeline:** May 2025 – Jul 2025[cite: 1] 
 
 ---
 
