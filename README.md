@@ -1,86 +1,105 @@
-# Spikeverse: A Neuromorphic Reinforcement Learning Framework for Autonomous Control
+# 🔥 EMBER
+### Event-driven Multi-stage Bio-inspired Efficient Reinforcement Learning
 
-**Brain and Cognitive Science (BCS) Club, IIT Kanpur**[cite: 1]  
-**Research Timeline:** May 2025 – Jul 2025[cite: 1] 
+**A neuromorphic reinforcement learning framework that converts state-of-the-art Deep RL policies into spiking neural networks — cutting inference compute by 80% without sacrificing performance.**
 
----
-
-## Abstract
-
-This repository details the research and implementation of **Spikeverse**, an advanced framework exploring the integration of Spiking Neural Networks (SNNs) with Deep Reinforcement Learning (DRL)[cite: 1]. The primary objective is to execute an Artificial Neural Network (ANN) to SNN conversion for game-playing agents, specifically targeting the Atari Breakout environment[cite: 1]. By translating dense, continuous neural representations into sparse, asynchronous spiking events, this architecture mitigates the extreme computational and energetic demands of traditional GPU-bound AI[cite: 1]. The converted neuromorphic agent achieves an 80% reduction in inference compute costs while preserving better-than-human performance and demonstrating high robustness to input perturbations[cite: 1].
-
----
-
-## 1. Introduction & Motivation
-
-The computational cost of training and deploying state-of-the-art Deep Neural Networks has grown exponentially, heavily reliant on dense matrix operations that trigger the von Neumann bottleneck[cite: 1]. Neuromorphic systems offer a biologically inspired, event-driven paradigm where computation is only activated when discrete spikes occur, drastically reducing energy consumption[cite: 1]. 
-
-This project bridges these two domains: taking a high-performing Deep Q-Network (DQN) policy and migrating it to an SNN to study performance trade-offs, computational efficiency, and alternative neuron models[cite: 1].
+![Status](https://img.shields.io/badge/status-research-orange)
+![Domain](https://img.shields.io/badge/domain-Neuromorphic%20Computing-blueviolet)
+![RL](https://img.shields.io/badge/RL-Rainbow%20DQN-red)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## 2. Theoretical Framework: The RL Engine
+## ⚡ Why EMBER
 
-Reinforcement Learning is mathematically formulated as a Markov Decision Process (MDP), defined by the 5-tuple $\mathcal{M}=(\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma)$[cite: 1]. The foundation of our learning engine leverages Q-learning, which relies on the Bellman Equation to iteratively estimate optimal state-action values[cite: 1]:
+Modern Deep RL agents are computational furnaces — dense matrix multiplications, GPU-bound inference, and energy costs that scale faster than the intelligence they produce. Biological brains do more with less: sparse, asynchronous spikes instead of dense floating-point activations.
 
-$$Q^{*}(s,a)=E_{s^{\prime}}[r+\gamma \max_{a^{\prime}}Q^{*}(s^{\prime},a^{\prime})|s,a]$$
-
-To achieve the necessary policy robustness in a sparse-reward environment like Atari Breakout, we engineered a **Rainbow DQN**, unifying six independent algorithmic advancements[cite: 1]:
-
-| Optimization Module | Theoretical Contribution & Implementation |
-| :--- | :--- |
-| **Double DQN (DDQN)** | Decouples action selection (online network) from evaluation (target network) to mitigate the systematic overestimation bias inherent to standard Q-learning[cite: 1]. |
-| **Prioritized Experience Replay** | Replaces uniform sampling with stochastic prioritization, assigning sampling probability $P(i)$ proportional to the absolute Temporal Difference (TD) error, combined with importance sampling weights to correct bias[cite: 1]. |
-| **Dueling Architecture** | Decomposes the Q-value into independent streams for State Value $V(s)$ and Advantage $A(s,a)$, improving evaluation in states where individual action choices have minimal impact on the outcome[cite: 1]. |
-| **N-Step TD Learning** | Computes the return $G_{t}^{(n)}$ by looking $n$ steps ahead, effectively propagating delayed rewards backward and optimizing credit assignment in sparse reward spaces[cite: 1]. |
-| **Noisy Networks** | Injects factorized Gaussian noise into the dense layer parameters, allowing the agent to dynamically learn and attenuate exploration strategies rather than relying on heuristic epsilon-greedy schedules[cite: 1]. |
-| **Distributional RL** | Models the complete probability distribution of returns $Z(s,a)$ rather than a single scalar expectation, capturing variance and multi-modal reward patterns[cite: 1]. |
+**EMBER bridges that gap.** It trains a champion-grade Rainbow DQN agent, then migrates its learned policy into a Spiking Neural Network (SNN) — an event-driven architecture that only computes when a neuron actually fires. The result is a neuromorphic agent that plays Atari Breakout better than a human, while spending 80% less compute to do it.
 
 ---
 
-## 3. Neuromorphic Architecture: SNN Conversion
+## 🏆 Headline Results
 
-Once the Rainbow DQN converges on an optimal continuous policy, the weights are mapped to a Spiking Neural Network[cite: 1]. This phase replaces standard artificial neurons (e.g., ReLU) with **Leaky Integrate-and-Fire (LIF)** models, which are governed by Ordinary Differential Equations (ODEs)[cite: 1].
-
-### 3.1 The LIF Neuron Dynamics
-The LIF neuron integrates incoming weighted spikes over time while simulating membrane leakage, analogous to an RC circuit[cite: 1]. The dynamics are described by:
-
-$$\tau \frac{dv(t)}{dt} = -(v(t) - v_{rest}) + \sum_{i=1} W_i \text{Input}_i$$
-
-When the membrane potential $v(t)$ crosses a defined firing threshold $v_{thresh}$, a discrete spike is emitted, and the potential resets[cite: 1]. Information in this network is propagated purely via spike timing and firing rates rather than activation magnitudes[cite: 1].
-
-### 3.2 Weight Normalization
-To ensure the successful transfer of the policy, the continuous ANN weights must be normalized[cite: 1]. Because spiking events become increasingly sparse in deeper layers of the network, we applied a scaling factor of 10 at each successive layer to maintain activation viability and optimize the sparse representation[cite: 1].
-
-### 3.3 Spike-Timing Dependent Plasticity (STDP)
-For localized learning, we also explore STDP, where synaptic weights $\Delta w$ are adjusted based on the timing difference $\Delta t = t_{post} - t_{pre}$[cite: 1]. This enables biologically plausible Long-Term Potentiation (LTP) and Long-Term Depression (LTD) based purely on causality[cite: 1].
+| Metric | Result |
+|---|---|
+| **Inference compute reduction** | **80%** vs. dense ANN baseline |
+| **Gameplay performance** | Better-than-human on Atari Breakout |
+| **Adversarial robustness** | High tolerance to input perturbation |
+| **Learning paradigm** | Fully event-driven, rate-coded spike propagation |
 
 ---
 
-## 4. Optimization under Non-Differentiability
+## 🧠 How It Works
 
-The fundamental barrier to optimizing SNNs is the spike generation mechanism, formalized as a Heaviside step function $H(x)$[cite: 1]:
+EMBER operates in two stages: **learn dense, deploy sparse.**
+
+### Stage 1 — Rainbow DQN: The Policy Engine
+
+The task is framed as a classical Markov Decision Process, $\mathcal{M}=(\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma)$, solved via Q-learning and the Bellman optimality equation:
+
+$$Q^{*}(s,a)=\mathbb{E}_{s^{\prime}}\left[r+\gamma \max_{a^{\prime}}Q^{*}(s^{\prime},a^{\prime})\mid s,a\right]$$
+
+Rather than vanilla DQN, EMBER unifies **six independent algorithmic upgrades** into a single Rainbow architecture, purpose-built for the sparse-reward Atari Breakout environment:
+
+| Module | What It Solves |
+|---|---|
+| **Double DQN** | Decouples action selection from evaluation to kill Q-value overestimation bias |
+| **Prioritized Experience Replay** | Samples transitions by TD-error magnitude instead of uniformly, with importance-sampling correction |
+| **Dueling Architecture** | Splits Q into State-Value $V(s)$ and Advantage $A(s,a)$ streams for sharper credit assignment |
+| **N-Step TD Learning** | Propagates delayed rewards $n$ steps backward for faster, more accurate learning signals |
+| **Noisy Networks** | Learns exploration directly via parametric noise — no epsilon-greedy heuristics |
+| **Distributional RL** | Models the full return distribution $Z(s,a)$, not just its mean, to capture reward variance |
+
+### Stage 2 — Neuromorphic Conversion: ANN → SNN
+
+Once Rainbow DQN converges, its weights are transplanted into a network of **Leaky Integrate-and-Fire (LIF)** neurons — a biologically grounded, ODE-governed alternative to ReLU:
+
+$$\tau \frac{dv(t)}{dt} = -(v(t) - v_{rest}) + \sum_i W_i \cdot \text{Input}_i$$
+
+A neuron fires only when its membrane potential $v(t)$ crosses threshold $v_{thresh}$ — then resets. Information travels as spike timing and firing rate, not activation magnitude.
+
+**Key engineering details:**
+- **Layer-wise weight normalization** — spikes sparsify with depth, so each successive layer is rescaled (×10) to keep signal viable through the network.
+- **STDP (Spike-Timing-Dependent Plasticity)** — synaptic weights are adjusted based on pre/post-spike timing offset $\Delta t = t_{post} - t_{pre}$, enabling biologically plausible local learning (LTP/LTD) as a secondary learning channel.
+
+---
+
+## 🧩 The Hard Problem: Training Something Non-Differentiable
+
+Spikes are binary — governed by a Heaviside step function:
 
 $$S(t)=H(u(t)-\theta)$$
 
-Because the derivative of $H(x)$ is zero almost everywhere, standard gradient descent (backpropagation) fails[cite: 1]. 
+Its derivative is zero almost everywhere, which breaks standard backpropagation outright. EMBER solves this with **surrogate gradients**: the forward pass fires real, non-differentiable spikes, while the backward pass substitutes a smooth approximation localized around the threshold. Four surrogate functions were benchmarked:
 
-### Surrogate Gradient Approximations
-To resolve this, we implemented **Surrogate Gradients**[cite: 1]. During the forward pass, the network accurately outputs the non-differentiable binary spike[cite: 1]. During the backward pass, the gradient is approximated using smooth, differentiable surrogate functions that localize the derivative around the threshold[cite: 1]. We evaluated multiple surrogate derivatives, including[cite: 1]:
+| Surrogate | Function |
+|---|---|
+| Fast Sigmoid | $\dfrac{1}{(1+\lvert x\rvert)^{2}}$ |
+| Exponential | $e^{-\lvert x\rvert}$ |
+| Piecewise Linear | $\max(0,\ 1-\lvert x\rvert)$ |
+| Cosh-based | $\dfrac{1}{\cosh^{2}(x)}$ |
 
-*   **Fast Sigmoid Derivative:** $\frac{1}{(1+|x|)^{2}}$[cite: 1]
-*   **Exponential Function:** $e^{-|x|}$[cite: 1]
-*   **Piece-wise Linear Function:** $\max(0,1-|x|)$[cite: 1]
-*   **Cosh-based Function:** $\frac{1}{\cosh^{2}(x)}$[cite: 1]
-
-These localized approximations ensure stable gradient flow, allowing the SNN to refine its policy representations.
+This keeps gradient flow stable enough to fine-tune the converted SNN's policy end-to-end.
 
 ---
 
-## 5. Empirical Outcomes
+## 📊 Validated Outcomes
 
-The deployment of the Spikeverse architecture yielded critical validations for the future of neuromorphic autonomous systems:
+1. **80% lower inference compute** — event-driven LIF processing vs. the dense Rainbow DQN baseline.
+2. **Performance held under quantization** — binary spikes and sparse activations still deliver better-than-human Atari Breakout play.
+3. **Robust under perturbation** — rate-coded spike networks proved inherently noise-tolerant in adversarial testing.
 
-1.  **Computational Efficiency:** The event-driven processing of the LIF network slashed inference compute costs by **80%** compared to the dense ANN baseline[cite: 1].
-2.  **Performance Retention:** Despite the aggressive quantization into binary spikes and the sparsity of activations, the agent successfully retained better-than-human gameplay performance in Atari Breakout[cite: 1].
-3.  **Adversarial Robustness:** The converted SNN displayed validated, high robustness to input perturbations, proving the inherent noise-tolerance of rate-coded spike networks in complex control environments[cite: 1].
+---
+
+## 🗺️ Roadmap
+
+- [ ] Extend beyond Breakout to the full Atari-57 suite
+- [ ] Benchmark on neuromorphic hardware (Loihi / Akida) for real energy measurements
+- [ ] Explore direct SNN training (skip ANN pretraining) via surrogate gradients from scratch
+- [ ] Hybrid STDP + surrogate-gradient training regime
+
+---
+
+## ## 👥 Contributors
+
+**Ashish Sharma** - [@AshishSharma2131](https://github.com/AshishSharma2131)
