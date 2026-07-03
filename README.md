@@ -4,6 +4,7 @@
 **A neuromorphic reinforcement learning framework that converts state-of-the-art Deep RL policies into spiking neural networks — cutting inference compute by 80% without sacrificing performance.**
 
 
+
 ---
 
 ## ⚡ Why EMBER
@@ -33,7 +34,9 @@ EMBER operates in two stages: **learn dense, deploy sparse.**
 
 The task is framed as a classical Markov Decision Process, $\mathcal{M}=(\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma)$, solved via Q-learning and the Bellman optimality equation:
 
-$$Q^{*}(s,a)=\mathbb{E}_{s^{\prime}}\left[r+\gamma \max_{a^{\prime}}Q^{*}(s^{\prime},a^{\prime})\mid s,a\right]$$
+```math
+Q^{*}(s,a)=\mathbb{E}_{s^{\prime}}\left[r+\gamma \max_{a^{\prime}}Q^{*}(s^{\prime},a^{\prime})\mid s,a\right]
+```
 
 Rather than vanilla DQN, EMBER unifies **six independent algorithmic upgrades** into a single Rainbow architecture, purpose-built for the sparse-reward Atari Breakout environment:
 
@@ -50,13 +53,21 @@ Rather than vanilla DQN, EMBER unifies **six independent algorithmic upgrades** 
 
 Once Rainbow DQN converges, its weights are transplanted into a network of **Leaky Integrate-and-Fire (LIF)** neurons — a biologically grounded, ODE-governed alternative to ReLU:
 
-$$\tau \frac{dv(t)}{dt} = -(v(t) - v_{rest}) + \sum_i W_i \cdot \text{Input}_i$$
+```math
+\tau \frac{dv(t)}{dt} = -(v(t) - v_{rest}) + \sum_i W_i \cdot \text{Input}_i
+```
 
 A neuron fires only when its membrane potential $v(t)$ crosses threshold $v_{thresh}$ — then resets. Information travels as spike timing and firing rate, not activation magnitude.
 
 **Key engineering details:**
 - **Layer-wise weight normalization** — spikes sparsify with depth, so each successive layer is rescaled (×10) to keep signal viable through the network.
-- **STDP (Spike-Timing-Dependent Plasticity)** — synaptic weights are adjusted based on pre/post-spike timing offset $\Delta t = t_{post} - t_{pre}$, enabling biologically plausible local learning (LTP/LTD) as a secondary learning channel.
+- **STDP (Spike-Timing-Dependent Plasticity)** — synaptic weights are adjusted based on pre/post-spike timing offset:
+
+```math
+\Delta t = t_{post} - t_{pre}
+```
+
+This enables biologically plausible Long-Term Potentiation (LTP) and Long-Term Depression (LTD) based purely on causality.
 
 ---
 
@@ -64,7 +75,9 @@ A neuron fires only when its membrane potential $v(t)$ crosses threshold $v_{thr
 
 Spikes are binary — governed by a Heaviside step function:
 
-$$S(t)=H(u(t)-\theta)$$
+```math
+S(t)=H(u(t)-\theta)
+```
 
 Its derivative is zero almost everywhere, which breaks standard backpropagation outright. EMBER solves this with **surrogate gradients**: the forward pass fires real, non-differentiable spikes, while the backward pass substitutes a smooth approximation localized around the threshold. Four surrogate functions were benchmarked:
 
